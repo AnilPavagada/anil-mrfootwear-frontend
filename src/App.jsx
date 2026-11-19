@@ -3,15 +3,20 @@ import Navbar from './components/common/Navbar'
 import HeroSection from './components/home/HeroSection'
 import Footer from './components/common/Footer'
 import ContactUs from './pages/ContactUs'
+import Reviews from './pages/Reviews'
 
 function App() {
-  const isContactPage = window.location.pathname.replace(/\/+$/, '') === '/contact'
+  const currentPath = window.location.pathname.replace(/\/+$/, '')
+  const isContactPage = currentPath === '/contact'
+  const isReviewsPage = currentPath === '/reviews'
 
   return (
     <div className="min-h-screen">
       <Navbar />
       <main>
-        {isContactPage ? (
+        {isReviewsPage ? (
+          <Reviews />
+        ) : isContactPage ? (
           <ContactUs />
         ) : (
           <>
