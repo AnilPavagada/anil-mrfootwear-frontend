@@ -26,6 +26,7 @@ import {
   XCircle,
 } from 'lucide-react'
 import StoredImage from '../components/common/StoredImage'
+import ProductWhatsAppShare from '../components/common/ProductWhatsAppShare'
 import {
   deleteAdminImage,
   initialAdminData,
@@ -38,6 +39,7 @@ import {
   ADMIN_STORAGE_KEY,
   REVIEWS_STORAGE_KEY,
 } from '../utils/adminStorage'
+import { ALL_COLLECTIONS_CATEGORY } from '../utils/productCategories'
 
 const navigation = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -267,7 +269,11 @@ function AdminPage() {
         : {
             name: '',
             sku: '',
-            category: data.categories[0]?.name || '',
+            category:
+              data.categories.find(
+                (category) =>
+                  category.name !== ALL_COLLECTIONS_CATEGORY.name
+              )?.name || '',
             price: '',
             stock: '',
             description: '',
@@ -425,6 +431,11 @@ function AdminPage() {
   }
 
   const handleCategoryDelete = (category) => {
+    if (category.name === ALL_COLLECTIONS_CATEGORY.name) {
+      setError('All Collections is required and cannot be deleted.')
+      return
+    }
+
     const linkedProducts = data.products.filter(
       (product) => product.category === category.name
     )
@@ -920,6 +931,9 @@ function AdminPage() {
                 placeholder="e.g. Kids Shoes"
                 className={inputClass}
               />
+              <span className="mt-1 block text-[11px] text-slate-400">
+                Categories become filters in the storefront product catalog.
+              </span>
             </FormField>
             {error && <p role="alert" className="text-sm text-rose-700">{error}</p>}
             <div className="flex flex-col-reverse gap-2 border-t border-slate-100 pt-4 sm:flex-row sm:justify-end">
@@ -1299,6 +1313,12 @@ function ProductsView({
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex justify-end gap-1">
+                      <ProductWhatsAppShare
+                        product={product}
+                        compact
+                        enableImageShare
+                        className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#25D366] text-white transition hover:bg-[#1ebe5d]"
+                      />
                       <button
                         type="button"
                         onClick={() => onEdit(product)}
@@ -1334,7 +1354,8 @@ function CategoriesView({ categories, onEdit, onDelete }) {
         <div>
           <h2 className="font-extrabold">Product categories</h2>
           <p className="mt-1 text-xs text-slate-400">
-            {categories.length} categories in your catalog
+            {categories.length} categories in your catalog. Products use these
+            categories in the storefront filters.
           </p>
         </div>
       </div>
@@ -1356,24 +1377,26 @@ function CategoriesView({ categories, onEdit, onDelete }) {
                   {category.productCount} linked {category.productCount === 1 ? 'product' : 'products'}
                 </p>
               </div>
-              <div className="flex gap-1">
-                <button
-                  type="button"
-                  onClick={() => onEdit(category)}
-                  aria-label={`Edit ${category.name}`}
-                  className="rounded-lg p-2 text-slate-500 hover:bg-orange-50 hover:text-orange-600"
-                >
-                  <Pencil size={16} />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => onDelete(category)}
-                  aria-label={`Delete ${category.name}`}
-                  className="rounded-lg p-2 text-slate-500 hover:bg-rose-50 hover:text-rose-600"
-                >
-                  <Trash2 size={16} />
-                </button>
-              </div>
+              {category.name !== ALL_COLLECTIONS_CATEGORY.name && (
+                <div className="flex gap-1">
+                  <button
+                    type="button"
+                    onClick={() => onEdit(category)}
+                    aria-label={`Edit ${category.name}`}
+                    className="rounded-lg p-2 text-slate-500 hover:bg-orange-50 hover:text-orange-600"
+                  >
+                    <Pencil size={16} />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onDelete(category)}
+                    aria-label={`Delete ${category.name}`}
+                    className="rounded-lg p-2 text-slate-500 hover:bg-rose-50 hover:text-rose-600"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              )}
             </article>
           ))}
         </div>

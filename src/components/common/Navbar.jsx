@@ -10,11 +10,17 @@ import {
 import logo from '../../assets/image/MR Footwear Crowned Sneaker Logo.png'
 import WhatsAppIcon from './WhatsAppIcon'
 import { createWhatsAppLink } from '../../utils/contactLinks'
+import {
+  ALL_COLLECTIONS_CATEGORY,
+  PRODUCT_CATEGORY_FILTERS,
+} from '../../utils/productCategories'
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
   const [productsOpen, setProductsOpen] = useState(false)
   const [mobileProductsOpen, setMobileProductsOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -27,11 +33,11 @@ function Navbar() {
   ]
 
   const productLinks = [
-    { name: 'All Products', href: '/products' },
-    { name: "Men's Shoes", href: '/products/men' },
-    { name: "Women's Shoes", href: '/products/women' },
-    { name: 'Sports Shoes', href: '/products/sports' },
-    { name: 'Kids Shoes', href: '/products/kids' },
+    { name: ALL_COLLECTIONS_CATEGORY.name, href: '/products' },
+    ...PRODUCT_CATEGORY_FILTERS.map((category) => ({
+      name: category.label,
+      href: `/products/${category.slug}`,
+    })),
   ]
 
   const whatsappLink = createWhatsAppLink(
@@ -124,7 +130,10 @@ function Navbar() {
         <div className="hidden shrink-0 items-center gap-3 xl:flex">
 
           <button
+            type="button"
+            onClick={() => setSearchOpen(!searchOpen)}
             aria-label="Search products"
+            aria-expanded={searchOpen}
             className="rounded-full p-2.5 text-gray-700 transition hover:bg-orange-50 hover:text-orange-600"
           >
             <Search size={20} />
@@ -145,6 +154,16 @@ function Navbar() {
 
         {/* Tablet and Mobile Actions */}
         <div className="flex shrink-0 items-center gap-2 xl:hidden">
+
+          <button
+            type="button"
+            onClick={() => setSearchOpen(!searchOpen)}
+            aria-label="Search products"
+            aria-expanded={searchOpen}
+            className="rounded-full p-2.5 text-gray-700 transition hover:bg-orange-50 hover:text-orange-600"
+          >
+            <Search size={20} />
+          </button>
 
           <a
             href={whatsappLink}
@@ -173,6 +192,37 @@ function Navbar() {
         </div>
 
       </nav>
+
+      {searchOpen && (
+        <div className="absolute inset-x-0 top-full z-50 border-t border-gray-100 bg-white px-4 py-4 shadow-lg sm:px-6">
+          <form
+            action="/products"
+            method="get"
+            className="mx-auto flex max-w-2xl items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 p-2 focus-within:border-orange-400 focus-within:ring-2 focus-within:ring-orange-100"
+          >
+            <Search
+              size={18}
+              className="ml-2 shrink-0 text-gray-400"
+              aria-hidden="true"
+            />
+            <input
+              type="search"
+              name="search"
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search shoes, sandals, and more..."
+              aria-label="Search products"
+              className="min-w-0 flex-1 bg-transparent px-2 py-2 text-sm text-gray-900 outline-none placeholder:text-gray-400"
+            />
+            <button
+              type="submit"
+              className="rounded-lg bg-orange-500 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-orange-600"
+            >
+              Search
+            </button>
+          </form>
+        </div>
+      )}
 
       {/* Mobile and Tablet Navigation */}
       {menuOpen && (

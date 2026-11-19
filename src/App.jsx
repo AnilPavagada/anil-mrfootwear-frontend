@@ -11,6 +11,7 @@ import WhyChooseUs from './pages/WhyChooseUs'
 import AboutUs from './pages/AboutUs'
 import LoginPage from './pages/LoginPage'
 import AdminPage from './pages/AdminPage'
+import ProductsPage from './pages/ProductsPage'
 
 function App() {
   const currentPath = window.location.pathname.replace(/\/+$/, '')
@@ -21,6 +22,8 @@ function App() {
   const isGalleryPage = currentPath === '/gallery'
   const isWhyChooseUsPage = currentPath === '/why-choose-us'
   const isAboutUsPage = currentPath === '/about'
+  const isProductsPage =
+    currentPath === '/products' || currentPath.startsWith('/products/')
 
   if (isAdminPage) return <AdminPage />
 
@@ -43,6 +46,8 @@ function App() {
           <WhyChooseUs />
         ) : isGalleryPage ? (
           <GallerySection variant="page" />
+        ) : isProductsPage ? (
+          <ProductsPage />
         ) : isContactPage ? (
           <ContactUs />
         ) : (

@@ -1,17 +1,39 @@
+import { INITIAL_PRODUCT_CATEGORIES } from './productCategories'
+
 export const ADMIN_STORAGE_KEY = 'mr-footwear-admin-v1'
 export const REVIEWS_STORAGE_KEY = 'mr-footwear-reviews-v1'
 
 const imageDatabaseName = 'mr-footwear-admin-images-v1'
 const imageStoreName = 'images'
 const maxImageSize = 8 * 1024 * 1024
+const categoryVersion = 3
+
+const legacyCategoryNames = new Map([
+  ["men's shoes", "Men's Shoes / Slippers"],
+  ["women's shoes", "Women's Shoes / Slippers"],
+  ['sports shoes', 'Sports Shoes / Slippers'],
+  ['kids shoes', 'Kids Shoes / Slippers'],
+  ['school shoes', 'School Shoes / Slippers'],
+  ['formal shoes', 'Casual & Formal'],
+  ['casual shoes', 'Casual & Formal'],
+  ['sandals', 'Casual & Formal'],
+  ['slippers', 'Casual & Formal'],
+  ['slippers & sandals', 'Casual & Formal'],
+  ["women's footwear", "Women's Shoes / Slippers"],
+  ['womens footwear', "Women's Shoes / Slippers"],
+  ["men's footwear", "Men's Shoes / Slippers"],
+  ['mens footwear', "Men's Shoes / Slippers"],
+  ['kids footwear', 'Kids Shoes / Slippers'],
+])
 
 export const initialAdminData = {
+  categoryVersion,
   products: [
     {
       id: 'product-demo-1',
       name: 'Air Flex Runner',
       sku: 'MR-AFR-001',
-      category: 'Sports Shoes',
+      category: 'Sports Shoes / Slippers',
       price: 2499,
       stock: 18,
       description: 'Lightweight everyday running shoes.',
@@ -21,7 +43,7 @@ export const initialAdminData = {
       id: 'product-demo-2',
       name: 'Classic Leather Formal',
       sku: 'MR-CLF-002',
-      category: 'Formal Shoes',
+      category: 'Casual & Formal',
       price: 3199,
       stock: 7,
       description: 'A clean, comfortable formal style.',
@@ -31,19 +53,14 @@ export const initialAdminData = {
       id: 'product-demo-3',
       name: 'Everyday Comfort Sandal',
       sku: 'MR-ECS-003',
-      category: 'Sandals',
+      category: 'Casual & Formal',
       price: 899,
       stock: 0,
       description: 'An easy slip-on sandal for daily wear.',
       imageId: '',
     },
   ],
-  categories: [
-    { id: 'category-demo-1', name: 'Sports Shoes' },
-    { id: 'category-demo-2', name: 'Formal Shoes' },
-    { id: 'category-demo-3', name: 'Sandals' },
-    { id: 'category-demo-4', name: 'Casual Shoes' },
-  ],
+  categories: INITIAL_PRODUCT_CATEGORIES,
   gallery: [],
 }
 
@@ -94,6 +111,8 @@ export function readAdminData() {
     !Array.isArray(parsedData.products) ||
     !Array.isArray(parsedData.categories) ||
     !Array.isArray(parsedData.gallery) ||
+    (parsedData.categoryVersion !== undefined &&
+      ![1, 2, categoryVersion].includes(parsedData.categoryVersion)) ||
     !parsedData.products.every(
       (product) =>
         product &&
@@ -127,11 +146,56 @@ export function readAdminData() {
     throw createStorageError('Saved admin data has an invalid format.')
   }
 
-  return parsedData
+  if (parsedData.categoryVersion === categoryVersion) return parsedData
+
+  const normalizeCategoryName = (name) =>
+    legacyCategoryNames.get(name.toLowerCase()) || name
+  const categoriesByName = new Map()
+  parsedData.categories.forEach((category) => {
+    const name = normalizeCategoryName(category.name)
+    const builtInCategory = INITIAL_PRODUCT_CATEGORIES.find(
+      (item) => item.name.toLowerCase() === name.toLowerCase()
+    )
+    const normalizedName = builtInCategory?.name || name
+    const key = normalizedName.toLowerCase()
+    if (!categoriesByName.has(key)) {
+      categoriesByName.set(key, { ...category, name: normalizedName })
+    }
+  })
+  INITIAL_PRODUCT_CATEGORIES.forEach((category) => {
+    const key = category.name.toLowerCase()
+    if (!categoriesByName.has(key)) categoriesByName.set(key, category)
+  })
+  const builtInNames = new Set(
+    INITIAL_PRODUCT_CATEGORIES.map((category) => category.name.toLowerCase())
+  )
+  const migratedCategories = [
+    ...INITIAL_PRODUCT_CATEGORIES.map(
+      (category) => categoriesByName.get(category.name.toLowerCase()) || category
+    ),
+    ...[...categoriesByName.entries()]
+      .filter(([name]) => !builtInNames.has(name))
+      .map(([, category]) => category),
+  ]
+
+  const migratedData = {
+    ...parsedData,
+    categoryVersion,
+    categories: migratedCategories,
+    products: parsedData.products.map((product) => ({
+      ...product,
+      category: normalizeCategoryName(product.category),
+    })),
+  }
+  window.localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(migratedData))
+  return migratedData
 }
 
 export function saveAdminData(data) {
-  window.localStorage.setItem(ADMIN_STORAGE_KEY, JSON.stringify(data))
+  window.localStorage.setItem(
+    ADMIN_STORAGE_KEY,
+    JSON.stringify({ ...data, categoryVersion })
+  )
 }
 
 export function readAdminReviews() {

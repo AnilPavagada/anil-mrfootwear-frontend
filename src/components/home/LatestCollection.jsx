@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import {
   AlertCircle,
+  ArrowRight,
   ChevronLeft,
   ChevronRight,
   Footprints,
 } from 'lucide-react'
 import StoredImage from '../common/StoredImage'
 import { ADMIN_STORAGE_KEY, readAdminData } from '../../utils/adminStorage'
-import WhatsAppIcon from '../common/WhatsAppIcon'
-import { createWhatsAppLink } from '../../utils/contactLinks'
+import ProductWhatsAppShare from '../common/ProductWhatsAppShare'
 
 const readProducts = () => {
   try {
@@ -27,11 +27,6 @@ const formatPrice = (price) =>
     currency: 'INR',
     maximumFractionDigits: 0,
   }).format(price)
-
-const whatsappLinkFor = (name) =>
-  createWhatsAppLink(
-    `Hello MR Footwear, please share the current availability and price for ${name}.`
-  )
 
 function LatestCollection() {
   const stylesRef = useRef(null)
@@ -84,26 +79,35 @@ function LatestCollection() {
             <span className="mt-3 block h-1 w-12 rounded-full bg-orange-500" />
           </header>
 
-          {products.length > 1 && (
-            <div className="hidden shrink-0 gap-2 sm:flex">
-              <button
-                type="button"
-                onClick={() => scrollStyles(-1)}
-                aria-label="Scroll to previous styles"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition hover:border-orange-500 hover:bg-orange-500 hover:text-white"
-              >
-                <ChevronLeft size={20} />
-              </button>
-              <button
-                type="button"
-                onClick={() => scrollStyles(1)}
-                aria-label="Scroll to more styles"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition hover:border-orange-500 hover:bg-orange-500 hover:text-white"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-          )}
+          <div className="flex shrink-0 items-center gap-2">
+            <a
+              href="/products"
+              className="inline-flex items-center gap-1 text-xs font-bold text-orange-600 transition hover:text-orange-700 sm:text-sm"
+            >
+              View all
+              <ArrowRight size={16} aria-hidden="true" />
+            </a>
+            {products.length > 1 && (
+              <div className="hidden gap-2 sm:flex">
+                <button
+                  type="button"
+                  onClick={() => scrollStyles(-1)}
+                  aria-label="Scroll to previous styles"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition hover:border-orange-500 hover:bg-orange-500 hover:text-white"
+                >
+                  <ChevronLeft size={20} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => scrollStyles(1)}
+                  aria-label="Scroll to more styles"
+                  className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition hover:border-orange-500 hover:bg-orange-500 hover:text-white"
+                >
+                  <ChevronRight size={20} />
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {error && (
@@ -174,15 +178,11 @@ function LatestCollection() {
                   <p className="mt-2 text-base font-extrabold text-gray-950">
                     {formatPrice(product.price)}
                   </p>
-                  <a
-                    href={whatsappLinkFor(product.name)}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <ProductWhatsAppShare
+                    product={product}
+                    enableImageShare
                     className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-orange-500 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-orange-600"
-                  >
-                    <WhatsAppIcon size={16} />
-                    Enquire on WhatsApp
-                  </a>
+                  />
                 </div>
               </article>
             ))}

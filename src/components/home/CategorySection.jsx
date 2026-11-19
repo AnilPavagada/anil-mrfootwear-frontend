@@ -4,53 +4,56 @@ import {
   Briefcase,
   Footprints,
   GraduationCap,
+  ShoppingBag,
   Sparkles,
-  Sun,
 } from 'lucide-react'
+import {
+  ALL_COLLECTIONS_CATEGORY,
+  PRODUCT_CATEGORY_FILTERS,
+} from '../../utils/productCategories'
 
-const categories = [
-  {
-    name: "Men's Shoes",
-    href: '/products/men',
+const categoryArt = {
+  all: {
+    icon: ShoppingBag,
+    tone: 'from-[#e8edf2] to-[#cdd8e2]',
+  },
+  men: {
     icon: Footprints,
     tone: 'from-[#f1e4d8] to-[#e1c2a8]',
   },
-  {
-    name: "Women's Footwear",
-    href: '/products/women',
+  women: {
     icon: Sparkles,
     tone: 'from-[#f3e4e6] to-[#dfbcc2]',
   },
-  {
-    name: 'Sports Shoes',
-    href: '/products/sports',
+  sports: {
     icon: Activity,
     tone: 'from-[#dce8f1] to-[#b4c9dc]',
   },
-  {
-    name: 'Slippers & Sandals',
-    href: '/products/sandals',
-    icon: Sun,
-    tone: 'from-[#f3e4d9] to-[#e5c4a5]',
-  },
-  {
-    name: 'Kids Footwear',
-    href: '/products/kids',
+  kids: {
     icon: Baby,
     tone: 'from-[#f3edcf] to-[#e4d89b]',
   },
-  {
-    name: 'School Shoes',
-    href: '/products/school',
+  school: {
     icon: GraduationCap,
     tone: 'from-[#e2e4e8] to-[#c3c9d2]',
   },
-  {
-    name: 'Casual & Formal',
-    href: '/products/formal',
+  formal: {
     icon: Briefcase,
     tone: 'from-[#eee0d5] to-[#d7bea9]',
   },
+}
+
+const categories = [
+  {
+    name: ALL_COLLECTIONS_CATEGORY.name,
+    href: '/products',
+    ...categoryArt.all,
+  },
+  ...PRODUCT_CATEGORY_FILTERS.map((category) => ({
+    name: category.label,
+    href: `/products/${category.slug}`,
+    ...categoryArt[category.slug],
+  })),
 ]
 
 function CategorySection() {
