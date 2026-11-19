@@ -1,34 +1,108 @@
-import { MessageCircle, Star } from 'lucide-react'
+import { useState } from 'react'
+import { Send, Star } from 'lucide-react'
 
-const reviews = [
-  {
-    name: 'Ravi K.',
-    initials: 'RK',
-    category: 'Comfort & quality',
-    quote:
-      'Great collection and comfortable footwear. The team helped me choose a pair that feels right for everyday wear.',
-  },
-  {
-    name: 'Anitha R.',
-    initials: 'AR',
-    category: 'Friendly service',
-    quote:
-      'I found stylish options at a good price, and the staff made the shopping experience easy and welcoming.',
-  },
-  {
-    name: 'Suresh M.',
-    initials: 'SM',
-    category: 'Great selection',
-    quote:
-      'There are plenty of choices for the family. It was easy to find something for different styles and occasions.',
-  },
-]
+const reviewStorageKey = 'mr-footwear-reviews-v1'
 
-const whatsappLink = `https://wa.me/919449632966?text=${encodeURIComponent(
-  'Hello MR Footwear, I would like to share my shopping experience.'
-)}`
+const isStoredReview = (review) =>
+  review !== null &&
+  typeof review === 'object' &&
+  typeof review.id === 'string' &&
+  typeof review.name === 'string' &&
+  typeof review.feedback === 'string' &&
+  Number.isInteger(review.rating) &&
+  review.rating >= 1 &&
+  review.rating <= 5 &&
+  typeof review.createdAt === 'string' &&
+  !Number.isNaN(Date.parse(review.createdAt))
 
-function Reviews() {
+function readStoredReviews() {
+  let savedReviews
+
+  try {
+    savedReviews = window.localStorage.getItem(reviewStorageKey)
+  } catch {
+    return {
+      reviews: [],
+      error: 'Your browser blocked access to saved reviews.',
+    }
+  }
+
+  if (!savedReviews) return { reviews: [], error: '' }
+
+  let parsedReviews
+  try {
+    parsedReviews = JSON.parse(savedReviews)
+  } catch {
+    return { reviews: [], error: 'Saved review data could not be read.' }
+  }
+
+  if (!Array.isArray(parsedReviews) || !parsedReviews.every(isStoredReview)) {
+    return {
+      reviews: [],
+      error: 'Saved review data is invalid and could not be displayed.',
+    }
+  }
+
+  return { reviews: parsedReviews, error: '' }
+}
+
+function Reviews({ variant = 'page' }) {
+  const isHomeSection = variant === 'home'
+  const Heading = isHomeSection ? 'h2' : 'h1'
+
+  const [savedReviewState, setSavedReviewState] = useState(readStoredReviews)
+  const [name, setName] = useState('')
+  const [feedback, setFeedback] = useState('')
+  const [rating, setRating] = useState(5)
+  const [status, setStatus] = useState('')
+  const reviews = savedReviewState.reviews
+  const storageError = savedReviewState.error
+
+  const handleSubmit = (event) => {
+    event.preventDefault()
+    setStatus('')
+    setSavedReviewState((currentState) => ({
+      ...currentState,
+      error: '',
+    }))
+
+    const trimmedName = name.trim()
+    const trimmedFeedback = feedback.trim()
+
+    if (!trimmedName || !trimmedFeedback) {
+      setStatus('Please enter your name and feedback before submitting.')
+      return
+    }
+
+    const nextReview = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      name: trimmedName,
+      feedback: trimmedFeedback,
+      rating,
+      createdAt: new Date().toISOString(),
+    }
+    const updatedReviews = [nextReview, ...reviews]
+
+    try {
+      window.localStorage.setItem(
+        reviewStorageKey,
+        JSON.stringify(updatedReviews)
+      )
+    } catch {
+      setSavedReviewState({
+        reviews,
+        error: 'Could not save your review in this browser. Please try again.',
+      })
+      return
+    }
+
+    setSavedReviewState({ reviews: updatedReviews, error: '' })
+    setName('')
+    setFeedback('')
+    setRating(5)
+    setStatus('Thank you! Your review has been added on this device.')
+  }
+
   return (
     <section
       aria-labelledby="reviews-heading"
@@ -42,79 +116,178 @@ function Reviews() {
       <div className="mx-auto max-w-7xl">
         <header className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-bold uppercase tracking-[0.24em] text-orange-400 sm:text-sm">
-            Customer stories
+            Customer feedback
           </p>
-          <h1
+          <Heading
             id="reviews-heading"
             className="mt-3 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl"
           >
-            Steps made <span className="text-orange-500">better.</span>
-          </h1>
+            Share your <span className="text-orange-500">experience.</span>
+          </Heading>
           <p className="mt-4 text-sm leading-7 text-gray-400 sm:text-base">
-            A great pair is only part of the experience. Here are a few sample
-            notes about the comfort, selection and service at MR Footwear.
+            Tell us what you think about your visit, our service or your new
+            footwear.
           </p>
         </header>
 
-        <div className="mt-9 grid gap-4 md:grid-cols-2 lg:mt-12 lg:grid-cols-3">
-          {reviews.map((review) => (
-            <article
-              key={review.name}
-              className="flex h-full flex-col rounded-2xl border border-white/10 bg-white/[0.04] p-5 transition hover:-translate-y-1 hover:border-orange-500/40 hover:bg-white/[0.06] sm:p-6"
-            >
-              <div className="flex items-center justify-between gap-3">
-                <div
-                  className="flex gap-1 text-orange-400"
-                  aria-label="5 out of 5 stars (sample review)"
-                >
-                  {Array.from({ length: 5 }, (_, index) => (
-                    <Star
-                      key={index}
-                      size={16}
-                      fill="currentColor"
-                      aria-hidden="true"
-                    />
-                  ))}
-                </div>
-                <span className="rounded-full border border-orange-500/20 bg-orange-500/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wide text-orange-300">
-                  Sample review
-                </span>
-              </div>
-
-              <p className="mt-5 flex-1 text-sm leading-7 text-gray-300">
-                “{review.quote}”
-              </p>
-
-              <div className="mt-6 flex items-center gap-3 border-t border-white/10 pt-5">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-orange-500/15 text-xs font-bold text-orange-300">
-                  {review.initials}
-                </span>
-                <div>
-                  <h2 className="text-sm font-bold text-white">{review.name}</h2>
-                  <p className="mt-0.5 text-xs text-gray-500">
-                    {review.category}
-                  </p>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
-
-        <p className="mt-5 text-center text-xs text-gray-500">
-          These are sample reviews. Replace them with verified customer
-          feedback before publishing.
-        </p>
-
-        <div className="mt-8 flex justify-center">
-          <a
-            href={whatsappLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-orange-600"
+        <div className="mx-auto mt-8 grid max-w-5xl gap-6 lg:mt-10 lg:grid-cols-[0.9fr_1.1fr]">
+          <form
+            onSubmit={handleSubmit}
+            className="rounded-2xl border border-white/10 bg-white/[0.04] p-5 sm:p-7"
           >
-            <MessageCircle size={18} />
-            Share your experience
-          </a>
+            <h2 className="text-xl font-bold text-white">Write a review</h2>
+            <p className="mt-2 text-sm leading-6 text-gray-400">
+              Reviews are saved in this browser. They are not shared with other
+              visitors until the site is connected to a review server.
+            </p>
+
+            <label
+              htmlFor="review-name"
+              className="mt-6 block text-sm font-semibold text-gray-200"
+            >
+              Your name
+            </label>
+            <input
+              id="review-name"
+              name="name"
+              type="text"
+              autoComplete="name"
+              maxLength={60}
+              required
+              value={name}
+              onChange={(event) => setName(event.target.value)}
+              placeholder="Enter your name"
+              className="mt-2 w-full rounded-lg border border-white/15 bg-black/40 px-4 py-3 text-sm text-white outline-none transition placeholder:text-gray-500 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+            />
+
+            <fieldset className="mt-5">
+              <legend className="text-sm font-semibold text-gray-200">
+                Your rating
+              </legend>
+              <div className="mt-2 flex gap-1">
+                {Array.from({ length: 5 }, (_, index) => {
+                  const starRating = index + 1
+
+                  return (
+                    <button
+                      key={starRating}
+                      type="button"
+                      onClick={() => setRating(starRating)}
+                      aria-label={`Rate ${starRating} out of 5 stars`}
+                      aria-pressed={rating === starRating}
+                      className="rounded p-1 text-orange-400 transition hover:scale-110 focus-visible:outline-2 focus-visible:outline-orange-400"
+                    >
+                      <Star
+                        size={24}
+                        fill={starRating <= rating ? 'currentColor' : 'none'}
+                      />
+                    </button>
+                  )
+                })}
+              </div>
+            </fieldset>
+
+            <label
+              htmlFor="review-feedback"
+              className="mt-5 block text-sm font-semibold text-gray-200"
+            >
+              Your feedback
+            </label>
+            <textarea
+              id="review-feedback"
+              name="feedback"
+              rows={4}
+              maxLength={600}
+              required
+              value={feedback}
+              onChange={(event) => setFeedback(event.target.value)}
+              placeholder="Share a few words about your experience..."
+              className="mt-2 w-full resize-y rounded-lg border border-white/15 bg-black/40 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-gray-500 focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20"
+            />
+            <p className="mt-1 text-right text-xs text-gray-500">
+              {feedback.length}/600
+            </p>
+
+            {storageError && (
+              <p role="alert" className="mt-3 text-sm text-red-400">
+                {storageError}
+              </p>
+            )}
+            {status && (
+              <p role="status" className="mt-3 text-sm text-orange-300">
+                {status}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-orange-500 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-orange-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-orange-400"
+            >
+              <Send size={17} />
+              Add your review
+            </button>
+          </form>
+
+          <section aria-labelledby="recent-reviews-heading">
+            <div className="flex items-center justify-between gap-3">
+              <h2
+                id="recent-reviews-heading"
+                className="text-xl font-bold text-white"
+              >
+                Recent reviews
+              </h2>
+              <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-gray-400">
+                {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
+              </span>
+            </div>
+
+            {reviews.length === 0 ? (
+              <div className="mt-4 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-5 py-10 text-center">
+                <Star size={26} className="mx-auto text-orange-400" />
+                <p className="mt-3 font-semibold text-white">
+                  Be the first to share feedback
+                </p>
+                <p className="mt-2 text-sm leading-6 text-gray-500">
+                  Your review will appear here after you submit it.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-4 max-h-[34rem] space-y-3 overflow-y-auto pr-1">
+                {reviews.map((review) => (
+                  <article
+                    key={review.id}
+                    className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 sm:p-5"
+                  >
+                    <div className="flex items-center gap-1 text-orange-400">
+                      {Array.from({ length: 5 }, (_, index) => (
+                        <Star
+                          key={index}
+                          size={15}
+                          fill={index < review.rating ? 'currentColor' : 'none'}
+                          aria-hidden="true"
+                        />
+                      ))}
+                      <span className="sr-only">{review.rating} out of 5 stars</span>
+                    </div>
+                    <p className="mt-3 whitespace-pre-wrap break-words text-sm leading-6 text-gray-300">
+                      {review.feedback}
+                    </p>
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-white/10 pt-3">
+                      <p className="text-sm font-semibold text-white">
+                        {review.name}
+                      </p>
+                      <time
+                        dateTime={review.createdAt}
+                        className="text-xs text-gray-500"
+                      >
+                        {new Date(review.createdAt).toLocaleDateString()}
+                      </time>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </section>
         </div>
       </div>
     </section>
