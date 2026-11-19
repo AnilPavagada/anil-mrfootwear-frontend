@@ -3,20 +3,26 @@ import Navbar from './components/common/Navbar'
 import HeroSection from './components/home/HeroSection'
 import CategorySection from './components/home/CategorySection'
 import LatestCollection from './components/home/LatestCollection'
+import GallerySection from './components/home/GallerySection'
 import Footer from './components/common/Footer'
 import ContactUs from './pages/ContactUs'
 import Reviews from './pages/Reviews'
 import WhyChooseUs from './pages/WhyChooseUs'
 import AboutUs from './pages/AboutUs'
 import LoginPage from './pages/LoginPage'
+import AdminPage from './pages/AdminPage'
 
 function App() {
   const currentPath = window.location.pathname.replace(/\/+$/, '')
+  const isAdminPage = currentPath === '/admin'
   const isLoginPage = currentPath === '/login'
   const isContactPage = currentPath === '/contact'
   const isReviewsPage = currentPath === '/reviews'
+  const isGalleryPage = currentPath === '/gallery'
   const isWhyChooseUsPage = currentPath === '/why-choose-us'
   const isAboutUsPage = currentPath === '/about'
+
+  if (isAdminPage) return <AdminPage />
 
   return (
     <div className="min-h-screen">
@@ -35,6 +41,8 @@ function App() {
           <Reviews />
         ) : isWhyChooseUsPage ? (
           <WhyChooseUs />
+        ) : isGalleryPage ? (
+          <GallerySection variant="page" />
         ) : isContactPage ? (
           <ContactUs />
         ) : (
@@ -42,6 +50,7 @@ function App() {
             <HeroSection />
             <CategorySection />
             <LatestCollection />
+            <GallerySection />
             <WhyChooseUs variant="home" />
             <Reviews variant="home" />
             <ContactUs variant="home" />

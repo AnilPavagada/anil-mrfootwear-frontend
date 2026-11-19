@@ -1,41 +1,57 @@
-import { useRef } from 'react'
-import { ChevronLeft, ChevronRight, Footprints, MessageCircle } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import {
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+  Footprints,
+} from 'lucide-react'
+import StoredImage from '../common/StoredImage'
+import { ADMIN_STORAGE_KEY, readAdminData } from '../../utils/adminStorage'
+import WhatsAppIcon from '../common/WhatsAppIcon'
+import { createWhatsAppLink } from '../../utils/contactLinks'
 
-const styles = [
-  {
-    name: "Men's Running Shoes",
-    label: "MEN'S | ACTIVE",
-    tone: 'from-[#e8edf2] to-[#cdd8e2]',
-  },
-  {
-    name: "Women's Everyday Sneakers",
-    label: "WOMEN'S | EVERYDAY",
-    tone: 'from-[#f2e8e9] to-[#e5ccce]',
-  },
-  {
-    name: 'Sports Shoes',
-    label: 'SPORT | COMFORT',
-    tone: 'from-[#e6ece4] to-[#cbd8c5]',
-  },
-  {
-    name: 'Casual Sandals',
-    label: "MEN'S | CASUAL",
-    tone: 'from-[#f1e7db] to-[#dfcbb3]',
-  },
-  {
-    name: "Kids' Everyday Shoes",
-    label: 'KIDS | DAILY WEAR',
-    tone: 'from-[#f3eddc] to-[#e5d8b8]',
-  },
-]
+const readProducts = () => {
+  try {
+    return { products: readAdminData().products, error: '' }
+  } catch (error) {
+    return {
+      products: [],
+      error: error.message || 'Products could not be loaded.',
+    }
+  }
+}
+
+const formatPrice = (price) =>
+  new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0,
+  }).format(price)
 
 const whatsappLinkFor = (name) =>
-  `https://wa.me/919449632966?text=${encodeURIComponent(
+  createWhatsAppLink(
     `Hello MR Footwear, please share the current availability and price for ${name}.`
-  )}`
+  )
 
 function LatestCollection() {
   const stylesRef = useRef(null)
+  const [{ products, error }, setProductState] = useState(readProducts)
+
+  useEffect(() => {
+    const refreshProducts = () => setProductState(readProducts())
+    const handleStorage = (event) => {
+      if (event.key === ADMIN_STORAGE_KEY || event.key === null) {
+        refreshProducts()
+      }
+    }
+
+    window.addEventListener('storage', handleStorage)
+    window.addEventListener('focus', refreshProducts)
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener('focus', refreshProducts)
+    }
+  }, [])
 
   const scrollStyles = (direction) => {
     const container = stylesRef.current
@@ -68,80 +84,110 @@ function LatestCollection() {
             <span className="mt-3 block h-1 w-12 rounded-full bg-orange-500" />
           </header>
 
-          <div className="hidden shrink-0 gap-2 sm:flex">
-            <button
-              type="button"
-              onClick={() => scrollStyles(-1)}
-              aria-label="Scroll to previous styles"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition hover:border-orange-500 hover:bg-orange-500 hover:text-white"
-            >
-              <ChevronLeft size={20} />
-            </button>
-            <button
-              type="button"
-              onClick={() => scrollStyles(1)}
-              aria-label="Scroll to more styles"
-              className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition hover:border-orange-500 hover:bg-orange-500 hover:text-white"
-            >
-              <ChevronRight size={20} />
-            </button>
-          </div>
-        </div>
-
-        <div
-          ref={stylesRef}
-          className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [scrollbar-width:thin] [scrollbar-color:#f97316_#e5e7eb]"
-        >
-          {styles.map(({ name, label, tone }) => (
-            <article
-              key={name}
-              className="w-[78%] min-w-[240px] max-w-[300px] shrink-0 snap-start overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg sm:w-[42%] sm:min-w-[250px] lg:w-[calc((100%-4rem)/5)] lg:min-w-[210px] lg:max-w-none"
-            >
-              <div
-                className={`relative flex h-48 items-center justify-center overflow-hidden bg-gradient-to-br ${tone} sm:h-56`}
+          {products.length > 1 && (
+            <div className="hidden shrink-0 gap-2 sm:flex">
+              <button
+                type="button"
+                onClick={() => scrollStyles(-1)}
+                aria-label="Scroll to previous styles"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition hover:border-orange-500 hover:bg-orange-500 hover:text-white"
               >
-                <span
-                  aria-hidden="true"
-                  className="absolute h-36 w-36 rounded-full border border-white/40 bg-white/25 blur-sm"
-                />
-                <span
-                  aria-hidden="true"
-                  className="absolute h-28 w-28 rounded-full border border-white/50"
-                />
-                <Footprints
-                  size={78}
-                  strokeWidth={1.25}
-                  aria-hidden="true"
-                  className="relative -rotate-12 text-gray-800 drop-shadow-sm transition-transform duration-300 hover:scale-110"
-                />
-                <span className="absolute left-3 top-3 rounded-full bg-orange-500 px-2.5 py-1 text-[10px] font-bold tracking-wide text-white">
-                  NEW STYLE
-                </span>
-              </div>
-
-              <div className="p-4 sm:p-5">
-                <p className="text-[10px] font-bold tracking-[0.14em] text-orange-600">
-                  {label}
-                </p>
-                <h3 className="mt-2 min-h-11 text-sm font-bold leading-5 text-gray-950 sm:text-base">
-                  {name}
-                </h3>
-                <p className="mt-1 text-xs text-gray-500">
-                  Ask us for current availability and price.
-                </p>
-                <a
-                  href={whatsappLinkFor(name)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-orange-500 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-orange-600"
-                >
-                  <MessageCircle size={15} />
-                  Enquire on WhatsApp
-                </a>
-              </div>
-            </article>
-          ))}
+                <ChevronLeft size={20} />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollStyles(1)}
+                aria-label="Scroll to more styles"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-gray-300 text-gray-700 transition hover:border-orange-500 hover:bg-orange-500 hover:text-white"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          )}
         </div>
+
+        {error && (
+          <p
+            role="alert"
+            className="mb-4 flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800"
+          >
+            <AlertCircle size={17} />
+            {error}
+          </p>
+        )}
+
+        {products.length === 0 ? (
+          <p className="rounded-2xl border border-dashed border-gray-300 bg-gray-50 px-5 py-10 text-center text-sm text-gray-600">
+            New products are coming soon. Please contact the store for current
+            availability.
+          </p>
+        ) : (
+          <div
+            ref={stylesRef}
+            className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4 [scrollbar-width:thin] [scrollbar-color:#f97316_#e5e7eb]"
+          >
+            {products.map((product) => (
+              <article
+                key={product.id}
+                className="w-[78%] min-w-[240px] max-w-[300px] shrink-0 snap-start overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-lg sm:w-[42%] sm:min-w-[250px] lg:w-[calc((100%-2rem)/3)] lg:min-w-[210px] lg:max-w-none"
+              >
+                <div className="relative flex h-48 items-center justify-center overflow-hidden bg-gradient-to-br from-[#e8edf2] to-[#cdd8e2] sm:h-56">
+                  {product.imageId ? (
+                    <StoredImage
+                      imageId={product.imageId}
+                      alt={product.name}
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                  ) : (
+                    <>
+                      <span
+                        aria-hidden="true"
+                        className="absolute h-36 w-36 rounded-full border border-white/40 bg-white/25 blur-sm"
+                      />
+                      <Footprints
+                        size={78}
+                        strokeWidth={1.25}
+                        aria-hidden="true"
+                        className="relative -rotate-12 text-gray-800 drop-shadow-sm"
+                      />
+                    </>
+                  )}
+                  <span
+                    className={`absolute left-3 top-3 rounded-full px-2.5 py-1 text-[10px] font-bold tracking-wide text-white ${
+                      product.stock > 0 ? 'bg-orange-500' : 'bg-gray-600'
+                    }`}
+                  >
+                    {product.stock > 0 ? 'IN STOCK' : 'OUT OF STOCK'}
+                  </span>
+                </div>
+
+                <div className="p-4 sm:p-5">
+                  <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-orange-600">
+                    {product.category}
+                  </p>
+                  <h3 className="mt-2 min-h-11 text-sm font-bold leading-5 text-gray-950 sm:text-base">
+                    {product.name}
+                  </h3>
+                  <p className="mt-1 min-h-10 text-xs leading-5 text-gray-500">
+                    {product.description || 'Ask us for current availability.'}
+                  </p>
+                  <p className="mt-2 text-base font-extrabold text-gray-950">
+                    {formatPrice(product.price)}
+                  </p>
+                  <a
+                    href={whatsappLinkFor(product.name)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-lg bg-orange-500 px-3 py-2.5 text-xs font-bold text-white transition hover:bg-orange-600"
+                  >
+                    <WhatsAppIcon size={16} />
+                    Enquire on WhatsApp
+                  </a>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         <p className="mt-2 text-center text-xs text-gray-500">
           Styles and availability may vary. Contact us for the latest stock and pricing.

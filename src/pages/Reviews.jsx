@@ -1,7 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Send, Star } from 'lucide-react'
-
-const reviewStorageKey = 'mr-footwear-reviews-v1'
+import { REVIEWS_STORAGE_KEY } from '../utils/adminStorage'
 
 const isStoredReview = (review) =>
   review !== null &&
@@ -13,13 +12,15 @@ const isStoredReview = (review) =>
   review.rating >= 1 &&
   review.rating <= 5 &&
   typeof review.createdAt === 'string' &&
-  !Number.isNaN(Date.parse(review.createdAt))
+  !Number.isNaN(Date.parse(review.createdAt)) &&
+  (review.status === undefined ||
+    ['pending', 'approved', 'rejected'].includes(review.status))
 
 function readStoredReviews() {
   let savedReviews
 
   try {
-    savedReviews = window.localStorage.getItem(reviewStorageKey)
+    savedReviews = window.localStorage.getItem(REVIEWS_STORAGE_KEY)
   } catch {
     return {
       reviews: [],
@@ -56,7 +57,26 @@ function Reviews({ variant = 'page' }) {
   const [rating, setRating] = useState(5)
   const [status, setStatus] = useState('')
   const reviews = savedReviewState.reviews
+  const publicReviews = reviews.filter(
+    (review) => (review.status || 'approved') === 'approved'
+  )
   const storageError = savedReviewState.error
+
+  useEffect(() => {
+    const refreshReviews = () => setSavedReviewState(readStoredReviews())
+    const handleStorage = (event) => {
+      if (event.key === REVIEWS_STORAGE_KEY || event.key === null) {
+        refreshReviews()
+      }
+    }
+
+    window.addEventListener('storage', handleStorage)
+    window.addEventListener('focus', refreshReviews)
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener('focus', refreshReviews)
+    }
+  }, [])
 
   const handleSubmit = (event) => {
     event.preventDefault()
@@ -80,12 +100,13 @@ function Reviews({ variant = 'page' }) {
       feedback: trimmedFeedback,
       rating,
       createdAt: new Date().toISOString(),
+      status: 'pending',
     }
     const updatedReviews = [nextReview, ...reviews]
 
     try {
       window.localStorage.setItem(
-        reviewStorageKey,
+        REVIEWS_STORAGE_KEY,
         JSON.stringify(updatedReviews)
       )
     } catch {
@@ -100,7 +121,9 @@ function Reviews({ variant = 'page' }) {
     setName('')
     setFeedback('')
     setRating(5)
-    setStatus('Thank you! Your review has been added on this device.')
+    setStatus(
+      'Thank you! Your review is saved and waiting for admin approval.'
+    )
   }
 
   return (
@@ -137,8 +160,8 @@ function Reviews({ variant = 'page' }) {
           >
             <h2 className="text-xl font-bold text-white">Write a review</h2>
             <p className="mt-2 text-sm leading-6 text-gray-400">
-              Reviews are saved in this browser. They are not shared with other
-              visitors until the site is connected to a review server.
+              Reviews are saved in this browser and appear publicly after admin
+              approval.
             </p>
 
             <label
@@ -237,11 +260,12 @@ function Reviews({ variant = 'page' }) {
                 Recent reviews
               </h2>
               <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-xs text-gray-400">
-                {reviews.length} {reviews.length === 1 ? 'review' : 'reviews'}
+                {publicReviews.length}{' '}
+                {publicReviews.length === 1 ? 'review' : 'reviews'}
               </span>
             </div>
 
-            {reviews.length === 0 ? (
+            {publicReviews.length === 0 ? (
               <div className="mt-4 rounded-2xl border border-dashed border-white/15 bg-white/[0.03] px-5 py-10 text-center">
                 <Star size={26} className="mx-auto text-orange-400" />
                 <p className="mt-3 font-semibold text-white">
@@ -253,7 +277,7 @@ function Reviews({ variant = 'page' }) {
               </div>
             ) : (
               <div className="mt-4 max-h-[34rem] space-y-3 overflow-y-auto pr-1">
-                {reviews.map((review) => (
+                {publicReviews.map((review) => (
                   <article
                     key={review.id}
                     className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 sm:p-5"

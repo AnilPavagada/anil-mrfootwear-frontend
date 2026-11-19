@@ -5,10 +5,11 @@ import {
   X,
   Search,
   ChevronDown,
-  MessageCircle,
 } from 'lucide-react'
 
 import logo from '../../assets/image/MR Footwear Crowned Sneaker Logo.png'
+import WhatsAppIcon from './WhatsAppIcon'
+import { createWhatsAppLink } from '../../utils/contactLinks'
 
 function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -33,11 +34,9 @@ function Navbar() {
     { name: 'Kids Shoes', href: '/products/kids' },
   ]
 
-  const whatsappNumber = '919449632966'
-
-  const whatsappLink = `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(
+  const whatsappLink = createWhatsAppLink(
     'Hello MR Footwear, I would like to enquire about your footwear collection.'
-  )}`
+  )
 
   const closeMobileMenu = () => {
     setMenuOpen(false)
@@ -135,9 +134,10 @@ function Navbar() {
             href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 rounded-lg bg-green-600 px-4 py-3 text-[13px] font-semibold tracking-wide text-white shadow-sm transition duration-200 hover:bg-green-700 hover:shadow-md"
+            aria-label="Chat with MR Footwear on WhatsApp"
+            className="inline-flex items-center gap-2.5 rounded-full bg-[#25D366] px-4 py-2.5 text-[13px] font-bold tracking-wide text-white shadow-md shadow-green-900/10 transition duration-200 hover:bg-[#1ebe5d] hover:shadow-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168a45]"
           >
-            <MessageCircle size={18} />
+            <WhatsAppIcon size={20} />
             WhatsApp
           </a>
 
@@ -150,12 +150,13 @@ function Navbar() {
             href={whatsappLink}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label="WhatsApp Enquiry"
-            className="flex items-center justify-center rounded-lg bg-green-600 p-2.5 text-white transition hover:bg-green-700 sm:gap-2 sm:px-4"
+            aria-label="Chat with MR Footwear on WhatsApp"
+            title="Chat with MR Footwear on WhatsApp"
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-[#25D366] p-2.5 text-white shadow-sm transition hover:bg-[#1ebe5d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168a45] sm:px-4"
           >
-            <MessageCircle size={19} />
+            <WhatsAppIcon size={20} />
 
-            <span className="hidden text-[13px] font-semibold sm:inline">
+            <span className="hidden text-[11px] font-semibold min-[360px]:inline sm:text-[13px]">
               WhatsApp
             </span>
           </a>
@@ -239,10 +240,20 @@ function Navbar() {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-4 flex items-center justify-center gap-2 rounded-lg bg-green-600 px-5 py-3.5 text-sm font-semibold tracking-wide text-white transition hover:bg-green-700"
+              aria-label="Chat with MR Footwear on WhatsApp"
+              className="mt-4 flex items-center gap-3 rounded-2xl bg-[#25D366] px-4 py-3.5 text-left text-white shadow-md shadow-green-900/10 transition hover:bg-[#1ebe5d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#168a45]"
             >
-              <MessageCircle size={19} />
-              WhatsApp Enquiry
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15">
+                <WhatsAppIcon size={22} />
+              </span>
+              <span>
+                <span className="block text-sm font-bold">
+                  Chat with us on WhatsApp
+                </span>
+                <span className="mt-0.5 block text-xs text-white/85">
+                  Ask us about styles, stock, or store hours
+                </span>
+              </span>
             </a>
 
           </div>

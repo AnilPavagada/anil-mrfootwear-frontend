@@ -3,15 +3,16 @@ import {
   Clock3,
   Mail,
   MapPin,
-  MessageCircle,
   Phone,
 } from 'lucide-react'
+import WhatsAppIcon from '../components/common/WhatsAppIcon'
+import { createWhatsAppLink } from '../utils/contactLinks'
 
 const mapLink = 'https://maps.app.goo.gl/Y5uVFLi93FuzUq59A'
 
-const whatsappLink = `https://wa.me/919449632966?text=${encodeURIComponent(
+const whatsappLink = createWhatsAppLink(
   'Hello MR Footwear, I would like to get in touch.'
-)}`
+)
 
 const contactItems = [
   {
@@ -119,10 +120,25 @@ function ContactUs({ variant = 'page' }) {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-green-700 sm:w-auto"
+              aria-label="Chat with MR Footwear on WhatsApp"
+              className="group mt-5 inline-flex w-full max-w-[440px] items-center gap-3 rounded-2xl bg-[#25D366] px-4 py-3.5 text-left text-white shadow-lg shadow-green-950/20 transition hover:bg-[#1ebe5d] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#25D366] sm:px-5"
             >
-              <MessageCircle size={19} />
-              Chat with us on WhatsApp
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/15 transition group-hover:scale-105">
+                <WhatsAppIcon size={24} />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-bold sm:text-base">
+                  Chat with us on WhatsApp
+                </span>
+                <span className="mt-0.5 block text-xs leading-5 text-white/85">
+                  Ask about styles, stock, or store hours
+                </span>
+              </span>
+              <ArrowUpRight
+                size={18}
+                aria-hidden="true"
+                className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
             </a>
           </div>
 

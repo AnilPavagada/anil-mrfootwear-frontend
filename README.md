@@ -14,3 +14,9 @@ The React Compiler is not enabled on this template because of its impact on dev 
 ## Expanding the ESLint configuration
 
 If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+
+## Admin dashboard prototype
+
+Run `npm run dev` and open `/admin` to manage the demo catalog, categories, gallery, and customer reviews. Admin products appear in the homepage collection, and gallery uploads appear in the homepage gallery. Catalog data is stored in this browser; uploaded images use IndexedDB. Customer reviews stay hidden from the storefront until approved and sync across open tabs on the same origin.
+
+This dashboard is a frontend prototype, not an authenticated admin system. Replace the browser-storage operations in `src/utils/adminStorage.js` with Spring Boot API calls and add server-side authentication and authorization before production use.
