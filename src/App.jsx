@@ -8,9 +8,11 @@ import ContactUs from './pages/ContactUs'
 import Reviews from './pages/Reviews'
 import WhyChooseUs from './pages/WhyChooseUs'
 import AboutUs from './pages/AboutUs'
+import LoginPage from './pages/LoginPage'
 
 function App() {
   const currentPath = window.location.pathname.replace(/\/+$/, '')
+  const isLoginPage = currentPath === '/login'
   const isContactPage = currentPath === '/contact'
   const isReviewsPage = currentPath === '/reviews'
   const isWhyChooseUsPage = currentPath === '/why-choose-us'
@@ -20,7 +22,14 @@ function App() {
     <div className="min-h-screen">
       <Navbar />
       <main>
-        {isAboutUsPage ? (
+        {isLoginPage ? (
+          <>
+            <LoginPage />
+            <WhyChooseUs variant="home" />
+            <Reviews variant="home" />
+            <ContactUs variant="home" />
+          </>
+        ) : isAboutUsPage ? (
           <AboutUs />
         ) : isReviewsPage ? (
           <Reviews />

@@ -22,6 +22,7 @@ function Navbar() {
     { name: 'Gallery', href: '/gallery' },
     { name: 'Reviews', href: '/reviews' },
     { name: 'Contact Us', href: '/contact' },
+    { name: 'Login', href: '/login' },
   ]
 
   const productLinks = [
