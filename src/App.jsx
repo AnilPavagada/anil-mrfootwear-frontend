@@ -11,7 +11,14 @@ function App() {
     <div className="min-h-screen">
       <Navbar />
       <main>
-        {isContactPage ? <ContactUs /> : <HeroSection />}
+        {isContactPage ? (
+          <ContactUs />
+        ) : (
+          <>
+            <HeroSection />
+            <ContactUs variant="home" />
+          </>
+        )}
       </main>
       <Footer />
     </div>

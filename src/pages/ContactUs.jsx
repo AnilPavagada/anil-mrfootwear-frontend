@@ -1,119 +1,115 @@
-import { Clock3, Mail, MapPin, MessageCircle, Navigation, Phone } from 'lucide-react'
+import {
+  ArrowUpRight,
+  Clock3,
+  Mail,
+  MapPin,
+  MessageCircle,
+  Phone,
+} from 'lucide-react'
+
+const mapLink = 'https://maps.app.goo.gl/Y5uVFLi93FuzUq59A'
 
 const whatsappLink = `https://wa.me/919449632966?text=${encodeURIComponent(
   'Hello MR Footwear, I would like to get in touch.'
 )}`
 
-const mapLink =
-  'https://www.google.com/maps/search/?api=1&query=MR+Footwear+Pavagada'
-
 const contactItems = [
   {
     icon: MapPin,
-    title: 'Visit Our Store',
-    content: (
-      <>
-        #7 Municipal Complex, New Bus Stand
-        <br />
-        Pavagada, Karnataka 561202
-      </>
-    ),
+    title: 'Visit our store',
+    detail: '#7 Municipal Complex, New Bus Stand, Pavagada, Karnataka 561202',
     href: mapLink,
   },
   {
     icon: Phone,
-    title: 'Call Us',
-    content: '+91 94496 32966',
+    title: 'Call us',
+    detail: '+91 94496 32966',
     href: 'tel:+919449632966',
   },
   {
     icon: Mail,
-    title: 'Email Us',
-    content: 'mrfootwearpvg@gmail.com',
+    title: 'Email us',
+    detail: 'mrfootwearpvg@gmail.com',
     href: 'mailto:mrfootwearpvg@gmail.com',
   },
   {
     icon: Clock3,
-    title: 'Opening Hours',
-    content: (
-      <>
-        Every day
-        <br />
-        9:00 AM – 9:00 PM
-      </>
-    ),
+    title: 'Store hours',
+    detail: 'Open every day, 9:00 AM – 9:00 PM',
   },
 ]
 
-function ContactUs() {
+function ContactUs({ variant = 'page' }) {
+  const isHomeSection = variant === 'home'
+  const Heading = isHomeSection ? 'h2' : 'h1'
+
   return (
-    <div className="bg-white">
-      <section className="relative overflow-hidden bg-[#111111] px-5 py-16 text-white sm:py-20">
-        <div className="absolute -right-20 -top-32 h-96 w-96 rounded-full bg-orange-500/20 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl">
-          <p className="text-sm font-bold uppercase tracking-[0.22em] text-orange-400">
-            We’re here to help
+    <section
+      id="contact"
+      className="relative isolate overflow-hidden bg-[#080808] px-5 py-14 text-white sm:px-8 sm:py-18 lg:py-20"
+    >
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -right-36 -top-32 -z-10 h-[28rem] w-[28rem] rounded-full bg-orange-600/15 blur-3xl"
+      />
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute -bottom-48 -left-36 -z-10 h-[28rem] w-[28rem] rounded-full bg-orange-500/10 blur-3xl"
+      />
+
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-9 max-w-2xl sm:mb-12">
+          <p className="text-xs font-bold uppercase tracking-[0.24em] text-orange-400 sm:text-sm">
+            {isHomeSection ? 'Come say hello' : 'We’re here to help'}
           </p>
-          <h1 className="mt-3 text-4xl font-black sm:text-5xl">
-            Contact <span className="text-orange-500">Us</span>
-          </h1>
-          <p className="mt-4 max-w-xl text-sm leading-7 text-gray-300 sm:text-base">
-            Have a question about our footwear or need help finding the right
-            pair? Get in touch or visit our store in Pavagada.
+          <Heading className="mt-3 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
+            {isHomeSection ? 'Let’s get you ' : 'Contact '}
+            <span className="text-orange-500">
+              {isHomeSection ? 'moving.' : 'MR Footwear'}
+            </span>
+          </Heading>
+          <p className="mt-4 max-w-xl text-sm leading-7 text-gray-400 sm:text-base">
+            Questions about a pair, our collection, or store hours? Reach out
+            to our team or stop by our Pavagada store. We’d be happy to help.
           </p>
         </div>
-      </section>
 
-      <main className="mx-auto max-w-7xl px-5 py-12 sm:px-8 sm:py-16">
-        <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
-          <section aria-labelledby="contact-details-heading">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-600">
-              Get in touch
-            </p>
-            <h2
-              id="contact-details-heading"
-              className="mt-2 text-2xl font-bold text-gray-950 sm:text-3xl"
-            >
-              We’d love to hear from you
-            </h2>
-            <p className="mt-3 max-w-xl text-sm leading-7 text-gray-600">
-              Our team is happy to help with store information, product
-              availability and footwear enquiries.
-            </p>
-
-            <div className="mt-8 grid gap-4 sm:grid-cols-2">
-              {contactItems.map(({ icon: Icon, title, content, href }) => {
-                const details = (
+        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
+          <div>
+            <div className="grid gap-3 sm:grid-cols-2 sm:gap-4">
+              {contactItems.map(({ icon: Icon, title, detail, href }) => {
+                const card = (
                   <>
-                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-orange-50 text-orange-600">
-                      <Icon size={21} />
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-orange-500/20 bg-orange-500/10 text-orange-400 transition group-hover:border-orange-500/50 group-hover:bg-orange-500 group-hover:text-white">
+                      <Icon size={20} />
                     </span>
-                    <span>
-                      <span className="block text-sm font-bold text-gray-900">
+                    <span className="min-w-0">
+                      <span className="block text-sm font-bold text-white">
                         {title}
                       </span>
-                      <span className="mt-1 block text-sm leading-6 text-gray-600">
-                        {content}
+                      <span className="mt-1.5 block text-sm leading-6 text-gray-400">
+                        {detail}
                       </span>
                     </span>
                   </>
                 )
 
-                return (
-                  <div
+                const className =
+                  'group flex min-h-28 items-start gap-4 rounded-2xl border border-white/10 bg-white/[0.04] p-4 transition hover:-translate-y-0.5 hover:border-orange-500/40 hover:bg-white/[0.07] sm:p-5'
+
+                return href ? (
+                  <a
                     key={title}
-                    className="flex min-h-28 items-start gap-4 rounded-2xl border border-gray-200 bg-white p-5 shadow-sm"
+                    href={href}
+                    target={href === mapLink ? '_blank' : undefined}
+                    rel={href === mapLink ? 'noopener noreferrer' : undefined}
+                    className={className}
                   >
-                    {href ? (
-                      <a
-                        href={href}
-                        className="flex items-start gap-4 focus-visible:outline-2 focus-visible:outline-orange-500"
-                      >
-                        {details}
-                      </a>
-                    ) : (
-                      details
-                    )}
+                    {card}
+                  </a>
+                ) : (
+                  <div key={title} className={className}>
+                    {card}
                   </div>
                 )
               })}
@@ -123,58 +119,72 @@ function ContactUs() {
               href={whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-7 inline-flex items-center gap-2 rounded-lg bg-green-600 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-green-700"
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3.5 text-sm font-bold text-white transition hover:bg-green-700 sm:w-auto"
             >
               <MessageCircle size={19} />
               Chat with us on WhatsApp
             </a>
-          </section>
+          </div>
 
-          <section
-            aria-labelledby="store-location-heading"
-            className="flex min-h-80 flex-col justify-between overflow-hidden rounded-2xl bg-gray-100 p-6 sm:p-8"
-          >
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-600">
-                Find us
-              </p>
-              <h2
-                id="store-location-heading"
-                className="mt-2 text-2xl font-bold text-gray-950"
-              >
-                Visit our store
-              </h2>
-              <p className="mt-3 max-w-sm text-sm leading-6 text-gray-600">
-                Drop by to explore our latest collection and get help from our
-                friendly team.
-              </p>
-            </div>
-
-            <div className="relative mt-8 flex min-h-48 items-center justify-center overflow-hidden rounded-xl border border-orange-100 bg-[radial-gradient(ellipse_at_20%_20%,#fff_0%,#fff_22%,transparent_23%),radial-gradient(ellipse_at_80%_70%,#fff_0%,#fff_24%,transparent_25%),linear-gradient(135deg,#f6eadb,#e6eee4)]">
-              <div className="absolute inset-x-0 top-1/2 h-3 -rotate-12 bg-white/80" />
-              <div className="absolute inset-y-0 left-1/3 w-3 rotate-12 bg-white/80" />
-              <div className="relative flex flex-col items-center rounded-xl bg-white px-5 py-3 text-center shadow-lg">
-                <MapPin size={25} className="text-orange-600" />
-                <span className="mt-1 text-sm font-bold text-gray-900">
-                  MR Footwear
-                </span>
-                <span className="text-xs text-gray-500">Pavagada</span>
+          <div className="rounded-2xl border border-white/10 bg-[#121212] p-4 sm:p-6">
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-orange-400">
+                  Find us
+                </p>
+                <h3 className="mt-2 text-xl font-bold text-white sm:text-2xl">
+                  Your next pair is nearby.
+                </h3>
               </div>
+              <MapPin className="shrink-0 text-orange-500" size={25} />
             </div>
 
             <a
               href={mapLink}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-5 inline-flex w-fit items-center gap-2 text-sm font-bold text-orange-600 transition hover:text-orange-700"
+              aria-label="Open MR Footwear location in Google Maps"
+              className="group relative mt-5 flex min-h-52 items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-[#1a1b19] sm:min-h-64"
             >
-              <Navigation size={17} />
-              Get directions
+              <div
+                aria-hidden="true"
+                className="absolute inset-0 opacity-60 [background-image:linear-gradient(28deg,transparent_47%,#353632_48%,#353632_50%,transparent_51%),linear-gradient(145deg,transparent_42%,#353632_43%,#353632_45%,transparent_46%),linear-gradient(90deg,transparent_48%,#2c2d2a_49%,#2c2d2a_51%,transparent_52%)] [background-size:120px_100px,160px_130px,190px_150px]"
+              />
+              <div className="absolute left-[17%] top-[23%] h-2 w-2 rounded-full bg-orange-500/80 shadow-[0_0_22px_8px_rgba(249,115,22,0.18)]" />
+              <div className="absolute bottom-[22%] right-[18%] h-2 w-2 rounded-full bg-orange-500/80 shadow-[0_0_22px_8px_rgba(249,115,22,0.18)]" />
+
+              <div className="relative flex flex-col items-center rounded-2xl border border-white/10 bg-[#101010]/95 px-5 py-4 text-center shadow-xl transition group-hover:border-orange-500/50">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-orange-500 text-white shadow-lg shadow-orange-500/30">
+                  <MapPin size={24} />
+                </span>
+                <span className="mt-3 text-sm font-bold text-white">
+                  MR Footwear
+                </span>
+                <span className="mt-1 max-w-52 text-xs leading-5 text-gray-400">
+                  #7 Municipal Complex, New Bus Stand, Pavagada
+                </span>
+                <span className="mt-3 inline-flex items-center gap-1 text-xs font-bold text-orange-400">
+                  Open in Google Maps
+                  <ArrowUpRight size={14} />
+                </span>
+              </div>
             </a>
-          </section>
+
+            <div className="mt-4 flex flex-col justify-between gap-3 text-sm sm:flex-row sm:items-center">
+              <p className="text-gray-400">Pavagada, Karnataka 561202</p>
+              <a
+                href={mapLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-bold text-orange-400 transition hover:text-orange-300"
+              >
+                Get directions <span aria-hidden="true">→</span>
+              </a>
+            </div>
+          </div>
         </div>
-      </main>
-    </div>
+      </div>
+    </section>
   )
 }
 
